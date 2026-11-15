@@ -6,7 +6,7 @@ import {FolderOpen,Plus,ArrowRight,Sparkles} from '@/components/Icons';
 export default async function Page({searchParams}:{searchParams:Promise<{project?:string}>}){
  const {project}=await searchParams;
  const presets=await listPresets();
- return <SectionPage active="/projects" projectId={project}>{data=<>
+ return <SectionPage active="/projects" projectId={project}>{data=><>
   <div className="detail-heading"><span className="eyebrow">ОРГАНИЗАЦИЯ ЗНАНИЙ</span><h1>Ваши проекты</h1><p>Каждый проект сохраняет свою историю, правила и накопленные решения.</p></div>
   <div className="project-list">{data.projects.map(p=><Link className="project-line" key={p.id} href={'/context?project='+encodeURIComponent(p.id)}><FolderOpen size={22}/><span><b>{p.name}</b><small>{p.description||'Перейти к знаниям проекта'}</small></span><ArrowRight size={18}/></Link>)}{data.projects.length===0&&<div className="empty">У вас пока нет проектов. Создайте первый.</div>}</div>
   <form className="create-form" action="/api/create-project" method="post"><h2>Новый проект</h2><div className="horizontal-form"><input name="name" required maxLength={120} placeholder="Название проекта"/><button className="blue-button"><Plus size={16}/> Создать</button></div></form>

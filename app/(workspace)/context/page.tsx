@@ -4,7 +4,7 @@ import {UploadCloud} from '@/components/Icons';
 
 export default async function Page({searchParams}:{searchParams:Promise<{project?:string;state?:string}>}){
  const {project,state}=await searchParams;
- return <SectionPage active="/context" projectId={project}>{data=<>
+ return <SectionPage active="/context" projectId={project}>{data=><>
   <div className="detail-heading"><span className="eyebrow">БИБЛИОТЕКА ПАМЯТИ</span><h1>Контекст проекта</h1><p>{data.project?.name||'Выберите проект'} · Факты, решения, гипотезы, навыки, задачи и технические сведения.</p></div>
   <div className="detail-two">
    <section className="detail-box"><h2>Добавить материалы</h2><p>Файлы попадут в очередь RAGA Core. До подтверждения найденное не становится правилом.</p>
