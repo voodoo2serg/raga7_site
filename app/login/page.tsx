@@ -23,12 +23,14 @@ export default async function Page({
       <div className="auth-card">
         <div className="auth-brand">
           <div className="auth-word">
-            RAGA <span>7</span>
+            RAGA <span>5</span>
           </div>
-          <span>Управление контекстом</span>
+          <span>Простой кабинет знаний</span>
         </div>
-        <h1>Вход</h1>
-        <p>Email и пароль. Промо / RAGA5 / RAGA7 — на сайте регистрации.</p>
+        <h1>Добро пожаловать</h1>
+        <p>
+          Войдите, чтобы за минуты собрать контекст проекта — без серверов, VPN и Enterprise Lab.
+        </p>
         {error ? (
           <div className="error-box">
             {error === 'credentials'
@@ -46,24 +48,26 @@ export default async function Page({
             <input name="password" type="password" required autoComplete="current-password" />
           </label>
           <button className="blue-button" type="submit">
-            Войти <span>→</span>
+            Войти в RAGA 5 <span>→</span>
           </button>
         </form>
         <p className="auth-hint">
-          Нет аккаунта?{' '}
-          <Link href={`${MARKETING}/login`}>Регистрация и выбор модели</Link>
+          Нет аккаунта? <Link href={MARKETING}>Регистрация на raga.vodopetov.ru</Link>
+          <br />
+          Простой тариф открывает этот кабинет. RAGA OS (Lab) — отдельный вход.
         </p>
-        <p className="auth-secure">Авторизация через RAGA Core.</p>
+        <p className="auth-secure">Авторизация через RAGA Core. Это не обрезанный RAGA OS.</p>
       </div>
       <div className="auth-aside">
         <div className="auth-visual">
-          <Image src="/brand/raga-5.png" alt="RAGA" width={250} height={250} priority />
+          <Image src="/brand/raga-5.png" alt="RAGA 5" width={250} height={250} priority />
         </div>
         <h2>
           Управляйте знаниями.
           <br />
           Не начинайте каждый раз заново.
         </h2>
+        <p>Проекты · импорт · проверка · handoff — один светлый экран.</p>
       </div>
     </div>
   );
