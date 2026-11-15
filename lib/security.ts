@@ -5,6 +5,7 @@ function allowedOrigins(): string[] {
     process.env.RAGA_SITE_ORIGIN,
     process.env.RAGA_ADMIN_ORIGIN,
     'https://raga7.vodopetov.ru',
+    'https://www.raga7.vodopetov.ru',
     'https://raga7admin.vodopetov.ru',
   ].filter(Boolean) as string[];
   const out: string[] = [];
