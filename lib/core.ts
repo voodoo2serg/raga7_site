@@ -32,7 +32,16 @@ const attempt=async <T,>(job:()=>Promise<T>,fallback:T):Promise<T>=>{try{return 
 export async function getSnapshot(projectId?:string):Promise<ProjectSnapshot>{
  if(isDemo)return{project:demoProjects.find(p=>p.id===projectId)||demoProjects[0],projects:demoProjects,knowledge:demoItems,summary:null,usage:null,billing:{subscription:{plan:'demo',status:'active'}},compatibility:[{client:'MCP Inspector',status:'verified'},{client:'ChatGPT',status:'blocked'},{client:'Claude',status:'blocked'}],integrations:[{id:'mcp_inbound',status:'staging',clients:[]}],dashboard:null,error:undefined};
  const token=await sessionToken();if(!token)return{project:null,projects:[],knowledge:[],summary:null,usage:null,billing:null,compatibility:[],integrations:[],dashboard:null,error:'not_authorized'};
- const projects=await attempt(()=>core<Project[]>('/api/auth/me/projects',{},token),[]);
+ let projects:Project[]=[];
+ try {
+  projects=await core<Project[]>('/api/auth/me/projects',{},token);
+ } catch {
+  // Do not silently treat Core outages as an empty workspace.
+  return {
+   project:null,projects:[],knowledge:[],summary:null,usage:null,billing:null,
+   compatibility:[],integrations:[],dashboard:null,error:'core_unavailable',
+  };
+ }
  const project=projects.find(p=>p.id===projectId)||projects[0]||null;
  const billing=await attempt(()=>core<Record<string,unknown>>('/api/billing/me',{},token),null);
  const compat=await attempt(()=>core<{clients:ProjectSnapshot['compatibility']}>('/api/public/client-compatibility',{},token),{clients:[]});
