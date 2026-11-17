@@ -51,6 +51,7 @@ export default async function Page({
             Войти в RAGA 5 <span>→</span>
           </button>
         </form>
+        <p className="auth-hint"><a href="https://raga.vodopetov.ru/restore-access">Забыли пароль? Получить письмо для восстановления ↗</a></p>
         <p className="auth-hint">
           Нет аккаунта? <Link href={MARKETING}>Регистрация на raga.vodopetov.ru</Link>
           <br />
