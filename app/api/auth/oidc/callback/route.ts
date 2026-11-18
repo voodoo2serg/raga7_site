@@ -9,7 +9,7 @@ export async function GET(req:NextRequest){
   return NextResponse.redirect(ORIGIN+'/login?error=oidc_failed',302);
  try{
   const sealed=req.cookies.get(STATE_COOKIE)?.value||'';
-  const {nonce,verifier}=consumeLogin(sealed,state);
+  const {nonce,verifier,promo}=consumeLogin(sealed,state);
   const token=await codeExchange(code,verifier);
   await verifyIdToken(token,nonce);
   const reply=await coreExchange(token);
