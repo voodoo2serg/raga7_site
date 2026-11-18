@@ -27,7 +27,7 @@ export async function GET(req:NextRequest){
   if(!session.access_token)throw new Error('RAGA Core session missing');
   // Verified identity and successful Core exchange; send an idempotent, one-to-one event.
   // A notification failure must not affect login.
-  await notifyVerifiedIdentity(String(identity.email),String(identity.sub));
+  if(registrationProof)await notifyVerifiedIdentity(String(identity.email),String(identity.sub));
   const response=NextResponse.redirect(ORIGIN+'/',302);
   response.cookies.set('raga_session',session.access_token,{
    httpOnly:true,secure:true,sameSite:'lax',path:'/',maxAge:8*3600
