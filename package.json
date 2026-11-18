@@ -1,8 +1,25 @@
 {
-  "name":"raga7-site",
-  "version":"0.1.0",
-  "private":true,
-  "scripts":{"dev":"next dev","build":"next build","start":"next start","typecheck":"tsc --noEmit","check":"node scripts/check.mjs"},
-  "dependencies":{"next":"15.5.7","react":"19.1.1","react-dom":"19.1.1","lucide-react":"^0.468.0"},
-  "devDependencies":{"typescript":"^5.7.3","@types/react":"^19.1.0","@types/node":"^22.10.0","@types/react-dom":"^19.1.0"}
+  "name": "raga7-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "next": "15.5.7",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "lucide-react": "^0.468.0",
+    "jose": "^6.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "@types/react": "^19.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react-dom": "^19.1.0"
+  }
 }
