@@ -6,7 +6,7 @@ export const ISSUER='https://auth.solo-pr.ru/realms/solo-pr';
 export const STATE_COOKIE='raga_oidc_state';
 export const PENDING_COOKIE='raga_oidc_pending';
 const REDIRECT='https://raga7.vodopetov.ru/api/auth/oidc/callback';
-const TTL=600;
+const TTL=3600;
 
 export function oidcConfig(){
  const client=process.env.RAGA_OIDC_CLIENT_ID||'';
@@ -26,7 +26,7 @@ function constantTime(a:string,b:string){
  return x.length===y.length&&timingSafeEqual(x,y);
 }
 
-export function makeLogin({email='',promo='',register=false}:{email?:string;promo?:string;register?:boolean}={}){
+export function makeLogin({email='',promo='',register=false,registrationProof=''}:{email?:string;promo?:string;register?:boolean;registrationProof?:string}={}){
  const c=oidcConfig();
  if(!c)throw new Error('Keycloak not configured for RAGA7');
  const state=b64(randomBytes(32));
@@ -34,7 +34,9 @@ export function makeLogin({email='',promo='',register=false}:{email?:string;prom
  const verifier=b64(randomBytes(48));
  const expires=String(Date.now()+TTL*1000);
  const safePromo=/^[A-Z0-9_-]{3,40}$/.test(promo.toUpperCase())?promo.toUpperCase():'';
- const payload=[state,nonce,verifier,expires,safePromo].join('.');
+ const safeProof=/^[A-Za-z0-9_-]{20,1500}\.[A-Za-z0-9_-]{40,90}$/.test(registrationProof)?registrationProof:'';
+ const proofPart=safeProof?b64(Buffer.from(safeProof)):'-';
+ const payload=[state,nonce,verifier,expires,safePromo,proofPart].join('.');
  const sealed=payload+'.'+sign(payload,c.secret);
  const challenge=b64(createHash('sha256').update(verifier).digest());
  const url=new URL(ISSUER+'/protocol/openid-connect/auth');
@@ -51,13 +53,14 @@ export function consumeLogin(sealed:string,receivedState:string){
  const c=oidcConfig();
  if(!c)throw new Error('Keycloak disabled');
  const parts=sealed.split('.');
- if(parts.length!==6)throw new Error('OIDC state cookie missing');
- const [state,nonce,verifier,expires,promo,mac]=parts;
- const unsigned=[state,nonce,verifier,expires,promo].join('.');
+ if(parts.length!==7)throw new Error('OIDC state cookie missing');
+ const [state,nonce,verifier,expires,promo,proofPart,mac]=parts;
+ const unsigned=[state,nonce,verifier,expires,promo,proofPart].join('.');
  if(!state||!nonce||!verifier||!receivedState||!constantTime(state,receivedState)||
     Number(expires)<Date.now()||Number(expires)>Date.now()+TTL*1000||
     !constantTime(mac,sign(unsigned,c.secret)))throw new Error('OIDC state invalid');
- return {nonce,verifier,promo};
+ const registrationProof=proofPart==='-'?'':Buffer.from(proofPart,'base64url').toString('utf8');
+ return {nonce,verifier,promo,registrationProof};
 }
 export async function verifyIdToken(token:string,nonce:string){
  const c=oidcConfig();
@@ -88,7 +91,7 @@ export async function codeExchange(code:string,verifier:string){
  if(!result.id_token)throw new Error('id_token_missing');
  return result.id_token;
 }
-export async function coreExchange(idToken:string,legacyToken?:string,promoCode=''){
+export async function coreExchange(idToken:string,legacyToken?:string,promoCode='',registrationProof=''){
  const c=oidcConfig();
  if(!c)throw new Error('OIDC not configured');
  const route=legacyToken?'/api/auth/oidc/link':'/api/auth/oidc/exchange';
@@ -96,7 +99,7 @@ export async function coreExchange(idToken:string,legacyToken?:string,promoCode=
   method:'POST',
   headers:{'content-type':'application/json','x-raga-bridge-secret':c.bridge,
    ...(legacyToken?{authorization:'Bearer '+legacyToken}:{})},
-  body:JSON.stringify({id_token:idToken,...(promoCode?{promo_code:promoCode}:{})}),cache:'no-store',signal:AbortSignal.timeout(15000)
+  body:JSON.stringify({id_token:idToken,...(promoCode?{promo_code:promoCode}:{}),...(registrationProof?{registration_proof:registrationProof}:{})}),cache:'no-store',signal:AbortSignal.timeout(15000)
  });
 }
 function encKey(secret:string){return createHash('sha256').update('raga-oidc-pending-v1').update(secret).digest();}
