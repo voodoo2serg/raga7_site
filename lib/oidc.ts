@@ -26,7 +26,7 @@ function constantTime(a:string,b:string){
  return x.length===y.length&&timingSafeEqual(x,y);
 }
 
-export function makeLogin({email='',promo=''}:{email?:string;promo?:string}={}){
+export function makeLogin({email='',promo='',register=false}:{email?:string;promo?:string;register?:boolean}={}){
  const c=oidcConfig();
  if(!c)throw new Error('Keycloak not configured for RAGA7');
  const state=b64(randomBytes(32));
@@ -44,6 +44,7 @@ export function makeLogin({email='',promo=''}:{email?:string;promo?:string}={}){
   code_challenge:challenge,code_challenge_method:'S256'
  }))url.searchParams.set(key,value);
  if(email.includes('@')&&!email.includes(' ')&&email.length<=254)url.searchParams.set('login_hint',email);
+ if(register)url.searchParams.set('prompt','create');
  return {url:url.toString(),sealed};
 }
 export function consumeLogin(sealed:string,receivedState:string){
