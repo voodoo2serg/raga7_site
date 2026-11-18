@@ -26,14 +26,15 @@ function constantTime(a:string,b:string){
  return x.length===y.length&&timingSafeEqual(x,y);
 }
 
-export function makeLogin(){
+export function makeLogin({email='',promo=''}:{email?:string;promo?:string}={}){
  const c=oidcConfig();
  if(!c)throw new Error('Keycloak not configured for RAGA7');
  const state=b64(randomBytes(32));
  const nonce=b64(randomBytes(32));
  const verifier=b64(randomBytes(48));
  const expires=String(Date.now()+TTL*1000);
- const payload=[state,nonce,verifier,expires].join('.');
+ const safePromo=/^[A-Z0-9_-]{3,40}$/.test(promo.toUpperCase())?promo.toUpperCase():'';
+ const payload=[state,nonce,verifier,expires,safePromo].join('.');
  const sealed=payload+'.'+sign(payload,c.secret);
  const challenge=b64(createHash('sha256').update(verifier).digest());
  const url=new URL(ISSUER+'/protocol/openid-connect/auth');
@@ -42,19 +43,20 @@ export function makeLogin(){
   scope:'openid email profile',state,nonce,
   code_challenge:challenge,code_challenge_method:'S256'
  }))url.searchParams.set(key,value);
+ if(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)&&email.length<=254)url.searchParams.set('login_hint',email);
  return {url:url.toString(),sealed};
 }
 export function consumeLogin(sealed:string,receivedState:string){
  const c=oidcConfig();
  if(!c)throw new Error('Keycloak disabled');
  const parts=sealed.split('.');
- if(parts.length!==5)throw new Error('OIDC state cookie missing');
- const [state,nonce,verifier,expires,mac]=parts;
- const unsigned=[state,nonce,verifier,expires].join('.');
+ if(parts.length!==6)throw new Error('OIDC state cookie missing');
+ const [state,nonce,verifier,expires,promo,mac]=parts;
+ const unsigned=[state,nonce,verifier,expires,promo].join('.');
  if(!state||!nonce||!verifier||!receivedState||!constantTime(state,receivedState)||
     Number(expires)<Date.now()||Number(expires)>Date.now()+TTL*1000||
     !constantTime(mac,sign(unsigned,c.secret)))throw new Error('OIDC state invalid');
- return {nonce,verifier};
+ return {nonce,verifier,promo};
 }
 export async function verifyIdToken(token:string,nonce:string){
  const c=oidcConfig();
@@ -85,7 +87,7 @@ export async function codeExchange(code:string,verifier:string){
  if(!result.id_token)throw new Error('id_token_missing');
  return result.id_token;
 }
-export async function coreExchange(idToken:string,legacyToken?:string){
+export async function coreExchange(idToken:string,legacyToken?:string,promoCode=''){
  const c=oidcConfig();
  if(!c)throw new Error('OIDC not configured');
  const route=legacyToken?'/api/auth/oidc/link':'/api/auth/oidc/exchange';
@@ -93,7 +95,7 @@ export async function coreExchange(idToken:string,legacyToken?:string){
   method:'POST',
   headers:{'content-type':'application/json','x-raga-bridge-secret':c.bridge,
    ...(legacyToken?{authorization:'Bearer '+legacyToken}:{})},
-  body:JSON.stringify({id_token:idToken}),cache:'no-store',signal:AbortSignal.timeout(15000)
+  body:JSON.stringify({id_token:idToken,...(promoCode?{promo_code:promoCode}:{})}),cache:'no-store',signal:AbortSignal.timeout(15000)
  });
 }
 function encKey(secret:string){return createHash('sha256').update('raga-oidc-pending-v1').update(secret).digest();}
