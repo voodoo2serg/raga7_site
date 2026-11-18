@@ -7,7 +7,7 @@ export async function GET(req:Request){
   const {url,sealed}=makeLogin({email:query.get('login_hint')||'',promo:query.get('promo')||'',register:query.get('register')==='1',registrationProof:query.get('registration_proof')||''});
   const response=NextResponse.redirect(url,302);
   response.cookies.set(STATE_COOKIE,sealed,{
-   httpOnly:true,secure:true,sameSite:'lax',path:'/api/auth/oidc',maxAge:600
+   httpOnly:true,secure:true,sameSite:'lax',path:'/api/auth/oidc',maxAge:3600
   });
   response.headers.set('Cache-Control','no-store');
   return response;
