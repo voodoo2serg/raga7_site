@@ -12,7 +12,7 @@ export async function GET(req:NextRequest){
   const {nonce,verifier,promo,registrationProof}=consumeLogin(sealed,state);
   const token=await codeExchange(code,verifier);
   await verifyIdToken(token,nonce);
-  const reply=await coreExchange(token,undefined,promo);
+  const reply=await coreExchange(token,undefined,promo,registrationProof);
   if(reply.status===409){
    const response=NextResponse.redirect(ORIGIN+'/login?error=link_required',302);
    response.cookies.set(PENDING_COOKIE,sealPending(token),{
