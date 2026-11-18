@@ -43,7 +43,7 @@ export function makeLogin({email='',promo=''}:{email?:string;promo?:string}={}){
   scope:'openid email profile',state,nonce,
   code_challenge:challenge,code_challenge_method:'S256'
  }))url.searchParams.set(key,value);
- if(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)&&email.length<=254)url.searchParams.set('login_hint',email);
+ if(email.includes('@')&&!email.includes(' ')&&email.length<=254)url.searchParams.set('login_hint',email);
  return {url:url.toString(),sealed};
 }
 export function consumeLogin(sealed:string,receivedState:string){
