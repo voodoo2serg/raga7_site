@@ -2,6 +2,7 @@ import {redirect} from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {currentUser} from '@/lib/core';
+import {oidcConfig} from '@/lib/oidc';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,8 @@ export default async function Page({
     // Core unreachable — still show login form.
   }
   const {error} = await searchParams;
+  const ssoReady=oidcConfig()!==null;
+  const linkRequired=error==='link_required'||error==='link_failed';
   return (
     <div className="auth-page">
       <div className="auth-card">
@@ -35,10 +38,16 @@ export default async function Page({
           <div className="error-box">
             {error === 'credentials'
               ? 'Не удалось войти. Проверьте email и пароль.'
+              : error === 'link_required' ? 'Keycloak подтвердил ваш email. Для сохранения прежних проектов один раз подтвердите старый пароль RAGA ниже.'
+              : error === 'link_failed' ? 'Не удалось привязать аккаунт. Проверьте прежние данные входа; проекты не изменены.'
+              : error === 'oidc_unavailable' ? 'Единый вход ещё не включён на сервере.'
+              : error === 'oidc_failed' ? 'Вход через Keycloak не завершился. Повторите попытку.'
               : 'Не удалось установить сессию.'}
           </div>
         ) : null}
-        <form className="login-form" method="post" action="/api/session">
+        {ssoReady&&!linkRequired&&<p><a className="blue-button" href="/api/auth/oidc/start">Войти или зарегистрироваться один раз через Keycloak →</a></p>}
+        <form className="login-form" method="post" action={linkRequired?'/api/auth/oidc/link':'/api/session'}>
+          {ssoReady&&<p className="auth-hint">{linkRequired?'Подтвердите прежнюю учётную запись RAGA':'Для ранее созданных учётных записей доступен переходный вход.'}</p>}
           <label>
             Электронная почта
             <input name="email" type="email" required autoComplete="username" placeholder="you@company.ru" />
@@ -57,7 +66,7 @@ export default async function Page({
           <br />
           Простой тариф открывает этот кабинет. RAGA OS (Lab) — отдельный вход.
         </p>
-        <p className="auth-secure">Авторизация через RAGA Core. Это не обрезанный RAGA OS.</p>
+        <p className="auth-secure">{ssoReady?'Единый вход через Keycloak. Ваши проекты остаются в RAGA Core.':'Вход через RAGA Core до включения общего Keycloak SSO.'}</p>
       </div>
       <div className="auth-aside">
         <div className="auth-visual">
