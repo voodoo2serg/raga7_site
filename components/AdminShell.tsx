@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import AppLauncher from './AppLauncher';
 import Link from 'next/link';
 import type {User} from '@/lib/types';
 import {PanelsTopLeft,Users,Wallet,LifeBuoy,ShieldCheck,LogOut,Settings2} from './Icons';
@@ -21,6 +22,7 @@ export function AdminShell({children,user,active}:{children:React.ReactNode;user
      <span className="brand-note">Admin · metadata only</span>
     </Link>
     <div className="top-actions">
+     <AppLauncher/>
      <span className="account-chip"><span className="account-dot"/>{user.email}</span>
      <Link className="ghost-btn" href="/"><Settings2 size={16}/> Кабинет</Link>
      <form action="/api/logout" method="post"><button className="icon-action" title="Выйти"><LogOut size={18}/></button></form>
