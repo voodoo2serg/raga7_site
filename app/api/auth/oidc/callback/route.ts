@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {codeExchange,consumeLogin,coreExchange,PENDING_COOKIE,sealPending,STATE_COOKIE,verifyIdToken} from '@/lib/oidc';
+import {notifyVerifiedIdentity} from '@/lib/signal-events';
 export const runtime='nodejs';
 const ORIGIN='https://raga7.vodopetov.ru';
 export async function GET(req:NextRequest){
@@ -11,7 +12,7 @@ export async function GET(req:NextRequest){
   const sealed=req.cookies.get(STATE_COOKIE)?.value||'';
   const {nonce,verifier,promo,registrationProof}=consumeLogin(sealed,state);
   const token=await codeExchange(code,verifier);
-  await verifyIdToken(token,nonce);
+  const identity=await verifyIdToken(token,nonce);
   const reply=await coreExchange(token,undefined,promo,registrationProof);
   if(reply.status===409){
    const response=NextResponse.redirect(ORIGIN+'/login?error=link_required',302);
@@ -24,6 +25,9 @@ export async function GET(req:NextRequest){
   if(!reply.ok)throw new Error('RAGA Core identity bridge failed');
   const session=await reply.json() as {access_token?:string};
   if(!session.access_token)throw new Error('RAGA Core session missing');
+  // Verified identity and successful Core exchange; send an idempotent, one-to-one event.
+  // A notification failure must not affect login.
+  await notifyVerifiedIdentity(String(identity.email),String(identity.sub));
   const response=NextResponse.redirect(ORIGIN+'/',302);
   response.cookies.set('raga_session',session.access_token,{
    httpOnly:true,secure:true,sameSite:'lax',path:'/',maxAge:8*3600
