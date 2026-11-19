@@ -4,7 +4,7 @@ import {core} from '@/lib/core';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const CABINET_HOME = 'https://raga.vodopetov.ru/cabinet/';
+const CABINET_HOME = 'https://raga.vodopetov.ru/cabinet';
 const MARKETING_LOGIN = 'https://raga.vodopetov.ru/login';
 
 /**
