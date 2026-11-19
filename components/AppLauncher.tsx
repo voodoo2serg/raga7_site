@@ -1,7 +1,7 @@
 const items=[
  {id:'solo',name:'Соло-Пиар',mark:'СП',href:'https://solo-pr.ru/'},
- // VR-198: one «Промо» only — mute separate raga / raga7 / raga9 tiles.
- {id:'raga',name:'Промо',mark:'ПР',href:'https://raga7.vodopetov.ru/'},
+ // VR-206: canonical public product is raga.vodopetov.ru (not raga7).
+ {id:'raga',name:'РАГА',mark:'РА',href:'https://raga.vodopetov.ru/'},
  {id:'signal',name:'СИГНАЛ',mark:'СИ',href:'https://signal.vodopetov.ru/'},
  {id:'crm',name:'CRM',mark:'CRM',href:'https://crm.solo-pr.ru/crm/'},
  {id:'voronka',name:'Воронка',mark:'ВО',href:'https://voronka.solo-pr.ru/ops/'},
