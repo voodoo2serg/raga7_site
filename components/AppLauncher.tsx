@@ -1,11 +1,11 @@
 const items=[
  {id:'solo',name:'Соло-Пиар',mark:'СП',href:'https://solo-pr.ru/'},
- {id:'raga',name:'РАГА',mark:'РА',href:'https://raga.vodopetov.ru/'},
- {id:'raga7',name:'Кабинет RAGA7',mark:'R7',href:'https://raga7.vodopetov.ru/'},
+ // VR-198: one «Промо» only — mute separate raga / raga7 / raga9 tiles.
+ {id:'raga',name:'Промо',mark:'ПР',href:'https://raga7.vodopetov.ru/'},
  {id:'signal',name:'СИГНАЛ',mark:'СИ',href:'https://signal.vodopetov.ru/'},
  {id:'crm',name:'CRM',mark:'CRM',href:'https://crm.solo-pr.ru/crm/'},
  {id:'voronka',name:'Воронка',mark:'ВО',href:'https://voronka.solo-pr.ru/ops/'},
- {id:'wited',name:'wi-ted',mark:'WT',href:'https://wi-ted.solo-pr.ru/'},
+ {id:'wited',name:'wi-ted',mark:'WT',href:'https://wited.familypaper.online/'},
  {id:'lms',name:'Обучение',mark:'LMS',href:'https://lms.solo-pr.ru/'},
  {id:'personal',name:'Личный сайт',mark:'СВ',href:'https://vodopetov.ru/'},
 ] as const;
