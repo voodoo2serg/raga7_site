@@ -4,6 +4,8 @@ function allowedOrigins(): string[] {
   const items = [
     process.env.RAGA_SITE_ORIGIN,
     process.env.RAGA_ADMIN_ORIGIN,
+    process.env.RAGA_MARKETING_ORIGIN,
+    'https://raga.vodopetov.ru',
     'https://raga7.vodopetov.ru',
     'https://www.raga7.vodopetov.ru',
     'https://raga7admin.vodopetov.ru',

@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 export default {
+  // Served under https://raga.vodopetov.ru/cabinet (canonical host; not raga7.*).
+  basePath: '/cabinet',
   poweredByHeader: false,
   reactStrictMode: true,
   async headers() {
