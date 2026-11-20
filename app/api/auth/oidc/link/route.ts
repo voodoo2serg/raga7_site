@@ -1,8 +1,11 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {coreExchange,openPending,PENDING_COOKIE} from '@/lib/oidc';
+import {CANONICAL_ORIGIN,coreExchange,OIDC_COOKIE_PATH,openPending,PENDING_COOKIE} from '@/lib/oidc';
 import {core} from '@/lib/core';
 import {verifiedOrigin} from '@/lib/security';
 export const runtime='nodejs';
+
+const MARKETING_LOGIN='https://raga.vodopetov.ru/login';
+
 export async function POST(req:NextRequest){
  if(!verifiedOrigin(req))return NextResponse.json({error:'origin_invalid'},{status:403});
  try{
@@ -10,7 +13,8 @@ export async function POST(req:NextRequest){
   const form=await req.formData();
   const email=String(form.get('email')||'').trim().toLowerCase();
   const password=String(form.get('password')||'');
-  if(!email.includes('@')||!password)return NextResponse.redirect(new URL('/login?error=credentials',req.url),303);
+  if(!email.includes('@')||!password)
+   return NextResponse.redirect(`${MARKETING_LOGIN}?error=credentials`,303);
   const legacy=await core<{access_token:string}>('/api/auth/login',{
    method:'POST',body:JSON.stringify({email,password})
   });
@@ -21,13 +25,13 @@ export async function POST(req:NextRequest){
   if(!exchange.ok)throw new Error('exchange rejected');
   const output=await exchange.json() as {access_token?:string};
   if(!output.access_token)throw new Error('RAGA Core token missing');
-  const response=NextResponse.redirect(new URL('/',req.url),303);
+  const response=NextResponse.redirect(CANONICAL_ORIGIN,303);
   response.cookies.set('raga_session',output.access_token,{
    secure:true,httpOnly:true,sameSite:'lax',path:'/',maxAge:8*3600
   });
-  response.cookies.delete(PENDING_COOKIE);
+  response.cookies.set(PENDING_COOKIE,'',{httpOnly:true,secure:true,sameSite:'lax',path:OIDC_COOKIE_PATH,maxAge:0});
   return response;
  }catch{
-  return NextResponse.redirect(new URL('/login?error=link_failed',req.url),303);
+  return NextResponse.redirect(`${MARKETING_LOGIN}?error=link_failed`,303);
  }
 }

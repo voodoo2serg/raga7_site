@@ -13,10 +13,10 @@ export default {
       "style-src 'self' 'unsafe-inline'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "font-src 'self' data:",
-      "connect-src 'self'",
+      "connect-src 'self' https://auth.solo-pr.ru https://raga.vodopetov.ru",
       "frame-ancestors 'none'",
       "base-uri 'self'",
-      "form-action 'self' https://yoomoney.ru https://*.yookassa.ru https://auth.robokassa.ru",
+      "form-action 'self' https://auth.solo-pr.ru https://yoomoney.ru https://*.yookassa.ru https://auth.robokassa.ru",
     ].join('; ');
     return [
       {
