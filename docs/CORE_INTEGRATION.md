@@ -21,7 +21,8 @@
 | Integrations | client-compatibility + integrations/status | без фейкового «connected» |
 | Billing | `/api/billing/me`, `/api/catalog/products`, `POST /api/billing/checkout` | YooKassa №1 |
 | Support | `/api/support/*` | не agent tickets |
-| Admin | `/internal/admin/*` | metadata only |
+| Admin | `/internal/admin/*` | metadata only · users/search · subs/payments · adjust · support queue+reply · security events · ops health |
+| Brand Voice | Core `/api/brand-voice/*` | **separate** surface — not folded into `/cabinet/admin` |
 
 ## Честность
 

@@ -9,6 +9,20 @@
 
 There is **no** separate public product at `/admin` or on `raga7admin.*`.
 
+## Staff product (VR-275)
+
+`/cabinet/admin` is the real ops surface (not JSON stubs):
+
+| Section | Work |
+|---------|------|
+| Overview | Counts + «Работа сегодня» → support queue |
+| Clients | Email search, access/plan, project metadata drill-down |
+| Billing | Subscriptions / payments tables + ledger **adjust** (reason + optional MFA) |
+| Support | Status filters, thread detail, reply, assign |
+| Security | Readable audit of admin adjustments / perimeter events |
+
+Data from Core `/internal/admin/*` (RBAC + MFA + IP). Content of knowledge is never shown by default.
+
 ## Entry
 
 1. Guest hits `/cabinet/admin` (or legacy `raga7admin.vodopetov.ru`)  
@@ -25,6 +39,10 @@ Status JSON reports `browser_e2e_verified:true` only when **both**:
 
 Set after a real browser IdP → `/cabinet` proof. Clear either env to flip the flag back to false.
 
-## Brand Voice (sibling repo)
+## Brand Voice (sibling — do not fold)
 
-Brand Voice OIDC in **RAG_for_AI** is a separate staff/product surface (`scope=brand_voice`). It is **not** part of `/cabinet/admin`. Leave its `browser_e2e_verified` false until a dedicated BV browser pass.
+Brand Voice OIDC in **RAG_for_AI** (`/api/brand-voice/*`, client `raga-brand-voice`, ACL `issuer+sub`) is a **separate** staff/product surface.
+
+- **Not** part of `/cabinet/admin` nav or chrome.
+- Keep `BRAND_VOICE_OIDC_BROWSER_E2E_VERIFIED` unset / false until a dedicated BV browser pass.
+- Docs: Core `docs/AUTH_209_BRAND_VOICE_OIDC.md`.
